@@ -3,9 +3,10 @@
     <!--Title-->
     <h1 class="text-center mt-5" >ToDo List.</h1>
     <!--Inputs for todo-->
-  <div>TASK</div>
+ 
     <div>
       <!--V model is used to create two way data bindings -->
+      <vue-confirm-dialog></vue-confirm-dialog>
       <input v-model="task" type="text" placeholder="What Is Your Task" class="w-100 form-control mt-3">
       <div
                         class="error"
@@ -14,7 +15,7 @@
                             submitStatus == 'ERROR'
                         "
                       >
-                        * Task Gerekli
+                        <span class="warning-req" >You Have To Fill The Task Area..</span>
                       </div>
       <textarea v-model="description"  cols="70" rows="3" placeholder="Description Of The Task" class="mt-3" ></textarea>
       <label class="mt-3" for="example-datepicker">Choose Your Deadline</label>
@@ -25,8 +26,9 @@
       <div class="text-center d-flex">
         <b-button pill variant="success" size="lg" align-v="center" class="mt-5"   @click="submitTaskx" >Submit Your Task</b-button>
         <b-button pill variant="warning" size="lg" align-v="center" class="mt-5 ms-5"  @click="editBtn" >Edit Your Task</b-button>
-        <b-button pill variant="danger" size="lg" align-v="center" class="mt-5 ms-5"  @click="deleteAllTasks"   >Clear All Tasks</b-button>
+        <b-button pill variant="danger" size="lg" align-v="center" class="mt-5 ms-5"  @click="showConfirm"   >Clear All Tasks</b-button>
         <b-button pill variant="info" size="lg" align-v="center" class="mt-5 ms-5"  @click="changeColor" >Change The Color</b-button>
+        
         
 
       </div>
@@ -63,7 +65,7 @@
 
       </td>
       <td>
-        <div class="text-center" @click="deleteTask(index)"  >
+        <div class="text-center" @click="showConfirmSingle(index)"  >
           <span class="fa fa-trash"></span>
         </div>
       </td>
@@ -95,6 +97,7 @@ export default {
       dateValue: null,
       editedTask: null,
       index : 0,
+      toastCount:0,
       colorChanger : ["white","info","primary","warning" , "danger" , "success" , "secondary" , "light" , "dark"],
       submitStatus : null,
       tasks:[
@@ -124,31 +127,81 @@ export default {
         task:{
           required
         },
-        description:{
-          required
-        }
+      
       },
 
     methods: {  
-     
+/* confirmation pop up to remove all tasks */
+      showConfirm(){
+        this.$confirm({
+          
+          title:'Confirm',
+          message : 'this Will Remove All Your Tasks. Do You Wanna Continue ?',
+          button : {
+            yes : 'Yes',
+            no : 'Cancel'
+          },
+          callback : confirm =>{
+            let counter = this.tasks.length;
+            if (confirm == true){
+              this.tasks.splice(0,this.tasks.length);
+              console.log(counter)
+              
+
+            }else{
+              return;
+            }
+          }
+        })
+      },
+
+        /**confirming pop up to deleting single task */
+      showConfirmSingle(index){
+        this.$confirm({
+          title : 'Confirm',
+          message:'This Task Will Be Removed?',
+          button : {
+            yes : 'Yes',
+            no : 'Cancel'
+          },
+          callback:confirm =>{
+            if (confirm == true){
+            this.tasks.splice(index,1)
+            }
+            
+          }
+        })
+      },
+
+
+    /*   deleteTask(index){
+        this.tasks.splice(index,1)
+      },*/
+
+
+     /*change background color func */
       changeColor(){
         console.log(this.index)
          if(this.index === 8){
         this.$set(this,"index",0)
       }else {
         this.index++;
+        this.$notification(
+        'Good job!', 
+        'You clicked the button!',
+        'success', 
+        async () => {
+        console.log('Clicked notification')
+  }, 
+  'A minute ago'
+)
+
       }
         
       },
 
 
-      deleteAllTasks(){
-        let counter = this.tasks.length;
-        this.tasks.splice(0,this.tasks.length);
-        console.log(counter)
-        
-
-      },
+    
 
       changeStatus(index){
        let newIndex = this.availableStatus.indexOf(this.tasks[index].status);
@@ -160,12 +213,17 @@ export default {
          return str.charAt(0).toUpperCase() + str.slice(1);
        },
       submitTask(){
+        this.$confirm({
+          message : "New Task Will Be Added.",
+          button : {
+            no : 'No',
+            yes : 'Yes'
 
-        console.log("SUBMIT TASK")
-        if(this.task.length === 0) 
-        return;
-        
-        if (this.editedTask === null){
+          },
+         
+          callback : confirm =>{
+            if (confirm){
+              if (this.editedTask === null){
           this.tasks.push({
           name : this.task,
           status : "to-do",
@@ -180,28 +238,34 @@ export default {
           this.editedTask = null;
           this.counter++;
         }
+   
+          
+        }
         this.task = ""
         this.description = ""
         this.dateValue = ""
+
+            }
+          
+        })
+ 
       },
       
 
       
-      deleteTask(index){
-        this.tasks.splice(index,1)
-      },
-            submitTaskx()
+     
+      submitTaskx()
          {
-           console.log("SUBMIT TASK XXXX")
+           
       this.$v.$touch();
       if (this.$v.$invalid) {
 
-        console.log("SUBMIT TASK XXXX IF")
+        
         
         
         this.submitStatus = "ERROR";
       } else { this.submitTask()
-          console.log("SUBMIT TASK XXXX ELSE")
+         
         
         this.submitStatus = "PENDING";
         setTimeout(() => {
@@ -239,4 +303,17 @@ export default {
 .finished{
   text-decoration: line-through;
 }
+.warning-req{
+  color: red;
+}
+
+
+/* 
+
+      this.toastCount++
+          this.$bvToast.toast('Task Created Successfully',{
+            title:'BootstrapVue Toast',
+            autoHideDelay : 5000,
+            
+          }) */
 </style>
