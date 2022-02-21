@@ -3,7 +3,7 @@
     <!--Title-->
     <h1 class="text-center mt-5" >ToDo List.</h1>
     <!--Inputs for todo-->
-
+  <div>TASK</div>
     <div>
       <!--V model is used to create two way data bindings -->
       <input v-model="task" type="text" placeholder="What Is Your Task" class="w-100 form-control mt-3">
