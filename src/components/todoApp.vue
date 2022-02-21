@@ -1,39 +1,59 @@
 <template>
-  <div class="container mb-5" style="max-width: 800px" >
+  <div :class="`container mb-5  bg-${colorChanger[index]} `" style="max-width: 800px"  >
     <!--Title-->
-    <h1 class="text-center mt-5" >ToDo Project</h1>
+    <h1 class="text-center mt-5" >ToDo List.</h1>
     <!--Inputs for todo-->
 
     <div>
       <!--V model is used to create two way data bindings -->
       <input v-model="task" type="text" placeholder="What Is Your Task" class="w-100 form-control mt-3">
+      <div
+                        class="error"
+                        v-if="
+                          !$v.task.required &&
+                            submitStatus == 'ERROR'
+                        "
+                      >
+                        * Task Gerekli
+                      </div>
       <textarea v-model="description"  cols="70" rows="3" placeholder="Description Of The Task" class="mt-3" ></textarea>
       <label class="mt-3" for="example-datepicker">Choose Your Deadline</label>
       <b-form-datepicker id="example-datepicker" v-model="dateValue" class="mb-2"></b-form-datepicker>
      <!-- <p>Value: '{{ value }}'</p> --> 
-      <div class="text-center" align-v="center">
-        <b-button pill variant="success" size="lg" align-v="center" class="mt-5"  @click="submitTask" >Submit Your Task</b-button>
+
+
+      <div class="text-center d-flex">
+        <b-button pill variant="success" size="lg" align-v="center" class="mt-5"   @click="submitTaskx" >Submit Your Task</b-button>
+        <b-button pill variant="warning" size="lg" align-v="center" class="mt-5 ms-5"  @click="editBtn" >Edit Your Task</b-button>
+        <b-button pill variant="danger" size="lg" align-v="center" class="mt-5 ms-5"  @click="deleteAllTasks"   >Clear All Tasks</b-button>
+        <b-button pill variant="info" size="lg" align-v="center" class="mt-5 ms-5"  @click="changeColor" >Change The Color</b-button>
+        
+
       </div>
       <!--task Table-->
     </div>
     <h1 class="text-center mt-5" style="color:red" >Things To Do</h1>
-    <table class="table mt-5">
-  <thead>
+    <table class="table mt-5 overflow-auto">
+  <thead class="overflow-auto" data-type = "scroll">
     <tr>
       <th scope="col" >Task</th>
       <th scope="col" >Status</th>
       <th scope="col" >Description</th>
       <th scope="col" >DeadLine</th>
-      <th scope="col" class="text-center">#</th>
-      <th scope="col" class="text-center">#</th>
+      <th scope="col" class="text-center">Edit</th>
+      <th scope="col" class="text-center">Delete</th>
       
     </tr>
   </thead>
-  <tbody>
+  <tbody class="overflow-auto" data-type = "scroll">
     <tr v-for="(task, index) in tasks" :key="index">
-      <td>{{task.name}}</td>
-      <td>{{task.status}}</td>
-      <td>{{task.description}}</td>
+      <td class="overflow-auto" data-type = "scroll">
+        <span data-spy="scroll" :class="{'finished' : task.status === 'finished'}" > {{task.name}} </span>
+       
+        
+        </td>
+      <td style="width:120px" > <span class="pointer"  :class="{'text-danger' : task.status === 'to-do', 'text-warning' : task.status === 'in progress', 'text-success': task.status === 'finished'}" @click="changeStatus(index)  " >{{firstCharUpper(task.status)}}</span></td>
+      <td  >{{task.description}}</td>
       <td>{{task.deadline}}</td>
       
       <td>
@@ -58,74 +78,165 @@
 </template>
 
 <script>
+
+
+
+import { required } from "vuelidate/lib/validators";
 export default {
+  
+  
   name: 'todoApp',
   data(){
     return{
-      value:'',
-      task:"",
-      description:"",
-      dateValue: "",
+      availableStatus: ['to-do','in progress', 'finished'],
+      value:null,
+      task:null,
+      description:null,
+      dateValue: null,
+      editedTask: null,
+      index : 0,
+      colorChanger : ["white","info","primary","warning" , "danger" , "success" , "secondary" , "light" , "dark"],
+      submitStatus : null,
       tasks:[
         {
           name : 'Learn Something New',
           description : 'learn About python flask',
           deadline : '2022-02-02',
-          status : 'in-progress'
+          status : 'in progress'
 
         },
-
         {
           name : 'do workout',
           description : 'hiit training',
           deadline : '2022-02-02',
           status : 'to-do'
+        },
+        { name : 'learn Vue.js',
+        description : 'remake the project with Vuex',
+        deadline : '2022-02-02',
+        status:'finished'
         }
+               
       ]
-
       }
     },
-    methods: {
+          validations: {
+        task:{
+          required
+        },
+        description:{
+          required
+        }
+      },
+
+    methods: {  
+     
+      changeColor(){
+        console.log(this.index)
+         if(this.index === 8){
+        this.$set(this,"index",0)
+      }else {
+        this.index++;
+      }
+        
+      },
+
+
+      deleteAllTasks(){
+        let counter = this.tasks.length;
+        this.tasks.splice(0,this.tasks.length);
+        console.log(counter)
+        
+
+      },
+
+      changeStatus(index){
+       let newIndex = this.availableStatus.indexOf(this.tasks[index].status);
+        if(++newIndex > 2 ) newIndex = 0;
+        this.tasks[index].status = this.availableStatus[newIndex];
+       },
+
+       firstCharUpper(str){
+         return str.charAt(0).toUpperCase() + str.slice(1);
+       },
       submitTask(){
 
-        if(this.task.length === 0) return;
-
-        this.tasks.push({
+        console.log("SUBMIT TASK")
+        if(this.task.length === 0) 
+        return;
+        
+        if (this.editedTask === null){
+          this.tasks.push({
           name : this.task,
           status : "to-do",
           description: this.description,
           deadline: this.dateValue,
-
+        })
+        }else{
+          this.tasks[this.editedTask].name = this.task;
           
-        }),
+          this.tasks[this.editedTask].description = this.description;
+          this.tasks[this.editedTask].deadline = this.dateValue;
+          this.editedTask = null;
+          this.counter++;
+        }
         this.task = ""
         this.description = ""
         this.dateValue = ""
-
       },
+      
 
-      /* !!!!!!!!!! */
+      
       deleteTask(index){
-        this.tasks.splite(index,1)
+        this.tasks.splice(index,1)
       },
+            submitTaskx()
+         {
+           console.log("SUBMIT TASK XXXX")
+      this.$v.$touch();
+      if (this.$v.$invalid) {
 
+        console.log("SUBMIT TASK XXXX IF")
+        
+        
+        this.submitStatus = "ERROR";
+      } else { this.submitTask()
+          console.log("SUBMIT TASK XXXX ELSE")
+        
+        this.submitStatus = "PENDING";
+        setTimeout(() => {
+          this.submitStatus = "OK";
+        }, 500);
+      }
+    },
       editTask(index){
         this.task = this.tasks[index].name;
         this.description = this.tasks[index].description;
+        this.editedTask = index;
+        
+        this.dateValue= this.tasks[index].deadline;
+        console.log(this.dateValue)
+        console.log(this.tasks[index].deadline)
+      },
 
-        /* !!!!!!!!! */
-        this.dateValue= this.tasks[index].dateValue;
+      editBtn(){
+          this.tasks[this.editedTask].name = this.task;
+          this.tasks[this.editedTask].description = this.description;
+          this.tasks[this.editedTask].deadline = this.dateValue;
+          this.editedTask = null;
+          this.counter++;
       }
-      
-
     }
-
-
   };
     
 </script>
 
 
 <style scoped>
-
+.pointer{
+  cursor: pointer;
+}
+.finished{
+  text-decoration: line-through;
+}
 </style>
