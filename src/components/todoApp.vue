@@ -32,6 +32,8 @@
         
 
       </div>
+
+    
       <!--task Table-->
     </div>
     <h1 class="text-center mt-5" style="color:red" >Things To Do</h1>
@@ -100,6 +102,7 @@ export default {
       toastCount:0,
       colorChanger : ["white","info","primary","warning" , "danger" , "success" , "secondary" , "light" , "dark"],
       submitStatus : null,
+      toastCOunt : 0,
       tasks:[
         {
           name : 'Learn Something New',
@@ -254,7 +257,26 @@ export default {
           this.editedTask = null;
           this.counter++;
       }
-    }
+    },
+
+      mounted(){
+        /*localStorage.setItem("isim", "Mustafa" )
+        alert(localStorage.getItem("isim")) */
+        if(localStorage.tasks){
+          this.tasks = JSON.parse(localStorage.tasks);
+        }
+        
+      },
+
+      watch:{
+        tasks :{
+          handler(newTask){
+          localStorage.tasks = JSON.stringify(newTask);
+        },
+        deep : true
+        }
+      }
+      
   };
     
 </script>

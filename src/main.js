@@ -9,10 +9,9 @@ import Vuelidate from "vuelidate"
 import VueSimpleAlert from 'vue-simple-alert'
 import notification from 'vue-notification-ui'
 import VueConfirmDialog from 'vue-confirm-dialog'
- 
+
 Vue.use(VueConfirmDialog)
 Vue.component('vue-confirm-dialog', VueConfirmDialog.default)
-
 Vue.use(notification, {
   position: 'notification-top-right', // top, bottom, left, right
   duration: 5000, // default
