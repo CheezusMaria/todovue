@@ -180,22 +180,12 @@ export default {
 
 
      /*change background color func */
-      changeColor(){
+            changeColor(){
         console.log(this.index)
          if(this.index === 8){
         this.$set(this,"index",0)
       }else {
         this.index++;
-        this.$notification(
-        'Good job!', 
-        'You clicked the button!',
-        'success', 
-        async () => {
-        console.log('Clicked notification')
-  }, 
-  'A minute ago'
-)
-
       }
         
       },
@@ -212,45 +202,19 @@ export default {
        firstCharUpper(str){
          return str.charAt(0).toUpperCase() + str.slice(1);
        },
-      submitTask(){
-        this.$confirm({
-          message : "New Task Will Be Added.",
-          button : {
-            no : 'No',
-            yes : 'Yes'
-
-          },
-         
-          callback : confirm =>{
-            if (confirm){
-              if (this.editedTask === null){
-          this.tasks.push({
+       submitTask(){
+        if(this.task.length === 0) return;
+        this.tasks.push({
           name : this.task,
           status : "to-do",
           description: this.description,
           deadline: this.dateValue,
-        })
-        }else{
-          this.tasks[this.editedTask].name = this.task;
           
-          this.tasks[this.editedTask].description = this.description;
-          this.tasks[this.editedTask].deadline = this.dateValue;
-          this.editedTask = null;
-          this.counter++;
-        }
-   
-          
-        }
+        }),
         this.task = ""
         this.description = ""
         this.dateValue = ""
-
-            }
-          
-        })
- 
       },
-      
 
       
      
@@ -310,7 +274,7 @@ export default {
 
 /* 
 
-      this.toastCount++
+    this.toastCount++
           this.$bvToast.toast('Task Created Successfully',{
             title:'BootstrapVue Toast',
             autoHideDelay : 5000,
