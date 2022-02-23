@@ -1,298 +1,352 @@
 <template>
-  <div :class="`container mb-5  bg-${colorChanger[index]} `" style="max-width: 800px"  >
+  <div
+    :class="`container mb-5  bg-${colorChanger[index]} `"
+    style="max-width: 800px"
+  >
     <!--Title-->
-    <h1 class="text-center mt-5" >ToDo List.</h1>
+    <h1 class="text-center mt-5">ToDo List.</h1>
     <!--Inputs for todo-->
- 
+
     <div>
       <!--V model is used to create two way data bindings -->
       <vue-confirm-dialog></vue-confirm-dialog>
-      <input v-model="task" type="text" placeholder="What Is Your Task" class="w-100 form-control mt-3">
-      <div
-                        class="error"
-                        v-if="
-                          !$v.task.required &&
-                            submitStatus == 'ERROR'
-                        "
-                      >
-                        <span class="warning-req" >You Have To Fill The Task Area..</span>
-                      </div>
-      <textarea v-model="description"  cols="70" rows="3" placeholder="Description Of The Task" class="mt-3" ></textarea>
+      <input
+        v-model="task"
+        type="text"
+        placeholder="What Is Your Task"
+        class="w-100 form-control mt-3"
+      />
+      <div class="error" v-if="!$v.task.required && submitStatus == 'ERROR'">
+        <span class="warning-req">You Have To Fill The Task Area..</span>
+      </div>
+      <textarea
+        v-model="description"
+        cols="70"
+        rows="3"
+        placeholder="Description Of The Task"
+        class="mt-3"
+      ></textarea>
       <label class="mt-3" for="example-datepicker">Choose Your Deadline</label>
-      <b-form-datepicker id="example-datepicker" v-model="dateValue" class="mb-2"></b-form-datepicker>
-     <!-- <p>Value: '{{ value }}'</p> --> 
+      <b-form-datepicker
+        id="example-datepicker"
+        v-model="dateValue"
+        class="mb-2"
+      ></b-form-datepicker>
+      <!-- <p>Value: '{{ value }}'</p> -->
 
-
-      <div class="text-center d-flex">
-        <b-button pill variant="success" size="lg" align-v="center" class="mt-5"   @click="submitTaskx" >Submit Your Task</b-button>
-        <b-button pill variant="warning" size="lg" align-v="center" class="mt-5 ms-5"  @click="editBtn" >Edit Your Task</b-button>
-        <b-button pill variant="danger" size="lg" align-v="center" class="mt-5 ms-5"  @click="showConfirm"   >Clear All Tasks</b-button>
-        <b-button pill variant="info" size="lg" align-v="center" class="mt-5 ms-5"  @click="changeColor" >Change The Color</b-button>
-        
-        
-
+      <div class="text-center d-flex justify-content-around">
+        <b-button
+          pill
+          variant="success"
+          size="lg"
+          align-v="center"
+          class="mt-5"
+          @click="submitTaskx"
+          >Submit Your Task</b-button
+        >
+        <b-button
+          pill
+          variant="warning"
+          size="lg"
+          align-v="center"
+          class="mt-5 ms-5"
+          @click="editBtn"
+          >Edit Your Task</b-button
+        >
+        <b-button
+          pill
+          variant="danger"
+          size="lg"
+          align-v="center"
+          class="mt-5 ms-5"
+          @click="showConfirm"
+          >Clear All Tasks</b-button
+        >
+        <!-- <b-button
+          pill
+          variant="info"
+          size="lg"
+          align-v="center"
+          class="mt-5 ms-5"
+          @click="changeColor"
+          >Change The Color</b-button
+        > -->
       </div>
 
-    
       <!--task Table-->
     </div>
-    <h1 class="text-center mt-5" style="color:red" >Things To Do</h1>
+    <h1 class="text-center mt-5" style="color: red">Things To Do</h1>
+    <div>
+      <b-dropdown id="dropdown-1" text="Selection" class="m-md-2">
+        <b-dropdown-item>All</b-dropdown-item>
+        <b-dropdown-item>Completed</b-dropdown-item>
+        <b-dropdown-item>In-Progress</b-dropdown-item>
+        <b-dropdown-item>To-Do</b-dropdown-item>
+      </b-dropdown>
+    </div>
     <table class="table mt-5 overflow-auto">
-  <thead class="overflow-auto" data-type = "scroll">
-    <tr>
-      <th scope="col" >Task</th>
-      <th scope="col" >Status</th>
-      <th scope="col" >Description</th>
-      <th scope="col" >DeadLine</th>
-      <th scope="col" class="text-center">Edit</th>
-      <th scope="col" class="text-center">Delete</th>
-      
-    </tr>
-  </thead>
-  <tbody class="overflow-auto" data-type = "scroll">
-    <tr v-for="(task, index) in tasks" :key="index">
-      <td class="overflow-auto" data-type = "scroll">
-        <span data-spy="scroll" :class="{'finished' : task.status === 'finished'}" > {{task.name}} </span>
-       
-        
-        </td>
-      <td style="width:120px" > <span class="pointer"  :class="{'text-danger' : task.status === 'to-do', 'text-warning' : task.status === 'in progress', 'text-success': task.status === 'finished'}" @click="changeStatus(index)  " >{{firstCharUpper(task.status)}}</span></td>
-      <td  >{{task.description}}</td>
-      <td>{{task.deadline}}</td>
-      
-      <td>
-        <div class="text-center" @click="editTask(index)" >
-          <span class="fa fa-pen" ></span>
-        </div>
+      <thead class="overflow-auto" data-type="scroll">
+        <tr>
+          <th scope="col">Task</th>
+          <th scope="col">Status</th>
+          <th scope="col">Description</th>
+          <th scope="col">DeadLine</th>
+          <th scope="col" class="text-center">Edit</th>
+          <th scope="col" class="text-center">Delete</th>
+        </tr>
+      </thead>
+      <tbody class="overflow-auto" data-type="scroll">
+        <tr v-for="(task, index) in tasks" :key="index">
+          <td class="overflow-auto" data-type="scroll">
+            <span
+              data-spy="scroll"
+              :class="{ finished: task.status === 'finished' }"
+            >
+              {{ task.name }}
+            </span>
+          </td>
+          <td style="width: 120px">
+            <select
+              @change="changeStatus1(index)"
+              name=""
+              id=""
+              class="pointer"
+              :class="{
+                'text-danger': task.status === 'to-do',
+                'text-warning': task.status === 'in progress',
+                'text-success': task.status === 'finished',
+              }"
+            >
+              <option value="to-do" :selected="task.status === 'to-do'">
+                To-do
+              </option>
+              <option
+                value="in progress"
+                :selected="task.status === 'in progress'"
+              >
+                In-Progress
+              </option>
+              <option value="finished" :selected="task.status === 'finished'">
+                Finished
+              </option>
+            </select>
+          </td>
+          <td>{{ task.description }}</td>
+          <td>{{ task.deadline }}</td>
 
-      </td>
-      <td>
-        <div class="text-center" @click="showConfirmSingle(index)"  >
-          <span class="fa fa-trash"></span>
-        </div>
-      </td>
-    </tr>
-   
-  </tbody>
-</table>
-    
-
+          <td>
+            <div class="text-center" @click="editTask(index)">
+              <span class="fa fa-pen"></span>
+            </div>
+          </td>
+          <td>
+            <div class="text-center" @click="showConfirmSingle(index)">
+              <span class="fa fa-trash"></span>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
   </div>
-    
 </template>
 
 <script>
-
-
-
 import { required } from "vuelidate/lib/validators";
 export default {
-  
-  
-  name: 'todoApp',
-  data(){
-    return{
-      availableStatus: ['to-do','in progress', 'finished'],
-      value:null,
-      task:null,
-      description:null,
+  name: "todoApp",
+  data() {
+    return {
+      availableStatus: ["to-do", "in progress", "finished"],
+      value: null,
+      task: null,
+      description: null,
       dateValue: null,
       editedTask: null,
-      index : 0,
-      toastCount:0,
-      colorChanger : ["white","info","primary","warning" , "danger" , "success" , "secondary" , "light" , "dark"],
-      submitStatus : null,
-      toastCOunt : 0,
-      tasks:[
+      index: 0,
+      toastCount: 0,
+      colorChanger: [
+        "white",
+        "info",
+        "primary",
+        "warning",
+        "danger",
+        "success",
+        "secondary",
+        "light",
+        "dark",
+      ],
+      newStatus: null,
+      submitStatus: null,
+      toastCOunt: 0,
+      tasks: [
         {
-          name : 'Learn Something New',
-          description : 'learn About python flask',
-          deadline : '2022-02-02',
-          status : 'in progress'
-
+          name: "Learn Something New",
+          description: "learn About python flask",
+          deadline: "2022-02-02",
+          status: "in progress",
         },
         {
-          name : 'do workout',
-          description : 'hiit training',
-          deadline : '2022-02-02',
-          status : 'to-do'
+          name: "do workout",
+          description: "hiit training",
+          deadline: "2022-02-02",
+          status: "to-do",
         },
-        { name : 'learn Vue.js',
-        description : 'remake the project with Vuex',
-        deadline : '2022-02-02',
-        status:'finished'
-        }
-               
-      ]
-      }
+        {
+          name: "learn Vue.js",
+          description: "remake the project with Vuex",
+          deadline: "2022-02-02",
+          status: "finished",
+        },
+      ],
+    };
+  },
+  validations: {
+    task: {
+      required,
     },
-          validations: {
-        task:{
-          required
+  },
+
+  methods: {
+    changeStatus1(index) {
+      this.tasks[index].status = event.target.value;
+    },
+
+    /* confirmation pop up to remove all tasks */
+    showConfirm() {
+      this.$confirm({
+        title: "Confirm",
+        message: "This Will Remove All Your Tasks. Do You Wanna Continue ?",
+        button: {
+          yes: "Yes",
+          no: "Cancel",
         },
-      
-      },
-
-    methods: {  
-/* confirmation pop up to remove all tasks */
-      showConfirm(){
-        this.$confirm({
-          
-          title:'Confirm',
-          message : 'this Will Remove All Your Tasks. Do You Wanna Continue ?',
-          button : {
-            yes : 'Yes',
-            no : 'Cancel'
-          },
-          callback : confirm =>{
-            let counter = this.tasks.length;
-            if (confirm == true){
-              this.tasks.splice(0,this.tasks.length);
-              console.log(counter)
-              
-
-            }else{
-              return;
-            }
+        callback: (confirm) => {
+          let counter = this.tasks.length;
+          if (confirm == true) {
+            this.tasks.splice(0, this.tasks.length);
+            console.log(counter);
+          } else {
+            return;
           }
-        })
-      },
+        },
+      });
+    },
 
-        /**confirming pop up to deleting single task */
-      showConfirmSingle(index){
-        this.$confirm({
-          title : 'Confirm',
-          message:'This Task Will Be Removed?',
-          button : {
-            yes : 'Yes',
-            no : 'Cancel'
-          },
-          callback:confirm =>{
-            if (confirm == true){
-            this.tasks.splice(index,1)
-            }
-            
+    /**confirming pop up to deleting single task */
+    showConfirmSingle(index) {
+      this.$confirm({
+        title: "Confirm",
+        message: "This Task Will Be Removed?",
+        button: {
+          yes: "Yes",
+          no: "Cancel",
+        },
+        callback: (confirm) => {
+          if (confirm == true) {
+            this.tasks.splice(index, 1);
           }
-        })
-      },
-
+        },
+      });
+    },
 
     /*   deleteTask(index){
         this.tasks.splice(index,1)
       },*/
 
-
-     /*change background color func */
-            changeColor(){
-        console.log(this.index)
-         if(this.index === 8){
-        this.$set(this,"index",0)
-      }else {
+    /*change background color func */
+    changeColor() {
+      console.log(this.index);
+      if (this.index === 8) {
+        this.$set(this, "index", 0);
+      } else {
         this.index++;
       }
-        
-      },
+    },
+    /* cahgestatus dropdown a gomulecek */
+    changeStatus(index) {
+      let newIndex = this.availableStatus.indexOf(this.tasks[index].status);
+      if (++newIndex > 2) newIndex = 0;
+      this.tasks[index].status = this.availableStatus[newIndex];
+    },
 
+    firstCharUpper(str) {
+      return str.charAt(0).toUpperCase() + str.slice(1);
+    },
+    submitTask() {
+      if (this.task.length === 0) return;
+      this.tasks.push({
+        name: this.task,
+        status: "to-do",
+        description: this.description,
+        deadline: this.dateValue,
+      });
+      this.task = "";
+      this.description = "";
+      this.dateValue = "";
+    },
 
-    
-
-      changeStatus(index){
-       let newIndex = this.availableStatus.indexOf(this.tasks[index].status);
-        if(++newIndex > 2 ) newIndex = 0;
-        this.tasks[index].status = this.availableStatus[newIndex];
-       },
-
-       firstCharUpper(str){
-         return str.charAt(0).toUpperCase() + str.slice(1);
-       },
-       submitTask(){
-        if(this.task.length === 0) return;
-        this.tasks.push({
-          name : this.task,
-          status : "to-do",
-          description: this.description,
-          deadline: this.dateValue,
-          
-        }),
-        this.task = ""
-        this.description = ""
-        this.dateValue = ""
-      },
-
-      
-     
-      submitTaskx()
-         {
-           
+    submitTaskx() {
       this.$v.$touch();
       if (this.$v.$invalid) {
-
-        
-        
-        
         this.submitStatus = "ERROR";
-      } else { this.submitTask()
-         
-        
+      } else {
+        this.submitTask();
+
         this.submitStatus = "PENDING";
         setTimeout(() => {
           this.submitStatus = "OK";
         }, 500);
       }
     },
-      editTask(index){
-        this.task = this.tasks[index].name;
-        this.description = this.tasks[index].description;
-        this.editedTask = index;
-        
-        this.dateValue= this.tasks[index].deadline;
-        console.log(this.dateValue)
-        console.log(this.tasks[index].deadline)
-      },
+    editTask(index) {
+      this.task = this.tasks[index].name;
+      this.description = this.tasks[index].description;
+      this.editedTask = index;
 
-      editBtn(){
-          this.tasks[this.editedTask].name = this.task;
-          this.tasks[this.editedTask].description = this.description;
-          this.tasks[this.editedTask].deadline = this.dateValue;
-          this.editedTask = null;
-          this.counter++;
-      }
+      this.dateValue = this.tasks[index].deadline;
+      console.log(this.dateValue);
+      console.log(this.tasks[index].deadline);
     },
 
-      mounted(){
-        /*localStorage.setItem("isim", "Mustafa" )
+    editBtn() {
+      this.tasks[this.editedTask].name = this.task;
+      this.tasks[this.editedTask].description = this.description;
+      this.tasks[this.editedTask].deadline = this.dateValue;
+      this.editedTask = null;
+      this.counter++;
+    },
+  },
+  /* adding tasks into local storage */
+  mounted() {
+    /*localStorage.setItem("isim", "Mustafa" )
         alert(localStorage.getItem("isim")) */
-        if(localStorage.tasks){
-          this.tasks = JSON.parse(localStorage.tasks);
-        }
-        
+    if (localStorage.tasks) {
+      this.tasks = JSON.parse(localStorage.tasks);
+    }
+  },
+  /*disarida tutulan bir object local storage da degisikliklerimi yapicak*/
+  watch: {
+    tasks: {
+      handler(newTask) {
+        localStorage.tasks = JSON.stringify(newTask);
       },
-
-      watch:{
-        tasks :{
-          handler(newTask){
-          localStorage.tasks = JSON.stringify(newTask);
-        },
-        deep : true
-        }
-      }
-      
-  };
-    
+      deep: true,
+    },
+  },
+};
 </script>
 
 
 <style scoped>
-.pointer{
+.pointer {
   cursor: pointer;
 }
-.finished{
+.finished {
   text-decoration: line-through;
 }
-.warning-req{
+.warning-req {
   color: red;
 }
-
 
 /* 
 
