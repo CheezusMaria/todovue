@@ -77,12 +77,20 @@
     </div>
     <h1 class="text-center mt-5" style="color: red">Things To Do</h1>
     <div>
-      <b-dropdown id="dropdown-1" text="Selection" class="m-md-2">
-        <b-dropdown-item>All</b-dropdown-item>
-        <b-dropdown-item>Completed</b-dropdown-item>
-        <b-dropdown-item>In-Progress</b-dropdown-item>
+      <b-form-select v-model="selection1" :options="options"></b-form-select>
+
+      <!-- <b-dropdown
+        v-model="selection1"
+        id="dropdown-1"
+        text="Selection"
+        class="m-md-2"
+        @click.native="setSelection"
+      >
+        <b-form-select>All</b-form-select>
+        <b-b-form-select-item>Finished</b-form-select>
+        <b-form-select>In-Progress</b-form-select>
         <b-dropdown-item>To-Do</b-dropdown-item>
-      </b-dropdown>
+      </b-dropdown> -->
     </div>
     <table class="table mt-5 overflow-auto">
       <thead class="overflow-auto" data-type="scroll">
@@ -96,11 +104,11 @@
         </tr>
       </thead>
       <tbody class="overflow-auto" data-type="scroll">
-        <tr v-for="(task, index) in tasks" :key="index">
+        <tr v-for="(task, index) in filteredTasks" :key="index">
           <td class="overflow-auto" data-type="scroll">
             <span
               data-spy="scroll"
-              :class="{ finished: task.status === 'finished' }"
+              :class="{ completed: task.status === 'completed' }"
             >
               {{ task.name }}
             </span>
@@ -114,7 +122,7 @@
               :class="{
                 'text-danger': task.status === 'to-do',
                 'text-warning': task.status === 'in progress',
-                'text-success': task.status === 'finished',
+                'text-success': task.status === 'completed',
               }"
             >
               <option value="to-do" :selected="task.status === 'to-do'">
@@ -126,8 +134,8 @@
               >
                 In-Progress
               </option>
-              <option value="finished" :selected="task.status === 'finished'">
-                Finished
+              <option value="completed" :selected="task.status === 'completed'">
+                Completed
               </option>
             </select>
           </td>
@@ -156,7 +164,14 @@ export default {
   name: "todoApp",
   data() {
     return {
-      availableStatus: ["to-do", "in progress", "finished"],
+      options: [
+        { value: null, text: "All Tasks" },
+        { value: "to-do", text: "To-Do" },
+        { value: "in progress", text: "In Progress" },
+        { value: "completed", text: "Completed" },
+      ],
+
+      availableStatus: ["to-do", "in progress", "completed"],
       value: null,
       task: null,
       description: null,
@@ -164,6 +179,7 @@ export default {
       editedTask: null,
       index: 0,
       toastCount: 0,
+      selection1: null,
       colorChanger: [
         "white",
         "info",
@@ -195,7 +211,7 @@ export default {
           name: "learn Vue.js",
           description: "remake the project with Vuex",
           deadline: "2022-02-02",
-          status: "finished",
+          status: "completed",
         },
       ],
     };
@@ -207,6 +223,12 @@ export default {
   },
 
   methods: {
+    setSelection(value) {
+      console.log(value);
+      //  @change="(value) => $set('selection1', value)"
+    },
+    testStat() {},
+
     changeStatus1(index) {
       this.tasks[index].status = event.target.value;
     },
@@ -325,10 +347,22 @@ export default {
     }
   },
   /*disarida tutulan bir object local storage da degisikliklerimi yapicak*/
+
+  computed: {
+    filteredTasks() {
+      let x = this.selection1;
+      console.log(x);
+      return this.tasks.filter(function (task) {
+        if (x === null) return true;
+        return task.status === x;
+      });
+    },
+  },
+
   watch: {
     tasks: {
-      handler(newTask) {
-        localStorage.tasks = JSON.stringify(newTask);
+      handler(updatedTasks) {
+        localStorage.tasks = JSON.stringify(updatedTasks);
       },
       deep: true,
     },
@@ -341,7 +375,7 @@ export default {
 .pointer {
   cursor: pointer;
 }
-.finished {
+.completed {
   text-decoration: line-through;
 }
 .warning-req {
