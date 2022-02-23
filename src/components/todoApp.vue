@@ -296,12 +296,14 @@ export default {
     },
     submitTask() {
       if (this.task.length === 0) return;
-      this.tasks.push({
-        name: this.task,
-        status: "to-do",
-        description: this.description,
-        deadline: this.dateValue,
-      });
+      else {
+        this.tasks.push({
+          name: this.task,
+          status: "to-do",
+          description: this.description,
+          deadline: this.dateValue,
+        });
+      }
       this.task = "";
       this.description = "";
       this.dateValue = "";
