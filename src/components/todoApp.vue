@@ -106,6 +106,7 @@
       <tbody class="overflow-auto" data-type="scroll">
         <tr v-for="(task, index) in filteredTasks" :key="index">
           <td class="overflow-auto" data-type="scroll">
+            <input type="checkbox" name="brand" />
             <span
               data-spy="scroll"
               :class="{ completed: task.status === 'completed' }"
@@ -231,6 +232,7 @@ export default {
 
     changeStatus1(index) {
       this.tasks[index].status = event.target.value;
+      localStorage.setItem("tasks", JSON.stringify(this.tasks));
     },
 
     /* confirmation pop up to remove all tasks */
@@ -303,6 +305,7 @@ export default {
           description: this.description,
           deadline: this.dateValue,
         });
+        localStorage.setItem("tasks", JSON.stringify(this.tasks));
       }
       this.task = "";
       this.description = "";
@@ -336,6 +339,7 @@ export default {
       this.tasks[this.editedTask].name = this.task;
       this.tasks[this.editedTask].description = this.description;
       this.tasks[this.editedTask].deadline = this.dateValue;
+      // localStorage.setItem("tasks", JSON.stringify(this.tasks));
       this.editedTask = null;
       this.counter++;
     },
@@ -344,12 +348,16 @@ export default {
   mounted() {
     /*localStorage.setItem("isim", "Mustafa" )
         alert(localStorage.getItem("isim")) */
-    if (localStorage.tasks) {
-      this.tasks = JSON.parse(localStorage.tasks);
+    if (localStorage.getItem("tasks")) {
+      this.tasks = JSON.parse(localStorage.getItem("tasks"));
     }
   },
-  /*disarida tutulan bir object local storage da degisikliklerimi yapicak*/
 
+  beforeDestroyed() {
+    localStorage.setItem("tasks", JSON.stringify(this.tasks));
+  },
+  /*disarida tutulan bir object local storage da degisikliklerimi yapicak*/
+  /*when u need to change data you use methods , when u need to change the presentation of existing data you use computed */
   computed: {
     filteredTasks() {
       let x = this.selection1;
@@ -361,14 +369,14 @@ export default {
     },
   },
 
-  watch: {
-    tasks: {
-      handler(updatedTasks) {
-        localStorage.tasks = JSON.stringify(updatedTasks);
-      },
-      deep: true,
-    },
-  },
+  // watch: {
+  //   tasks: {
+  //     handler(updatedTasks) {
+  //       localStorage.tasks = JSON.stringify(updatedTasks);
+  //     },
+  //     deep: true,
+  //   },
+  // },
 };
 </script>
 
