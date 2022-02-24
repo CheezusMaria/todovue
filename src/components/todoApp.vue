@@ -62,6 +62,16 @@
           @click="showConfirm"
           >Clear All Tasks</b-button
         >
+
+        <b-button
+          pill
+          variant="danger"
+          size="lg"
+          align-v="center"
+          class="mt-5 ms-5"
+          @click="TEST"
+          >TEST</b-button
+        >
         <!-- <b-button
           pill
           variant="info"
@@ -92,7 +102,12 @@
         <b-dropdown-item>To-Do</b-dropdown-item>
       </b-dropdown> -->
     </div>
-    <table class="table mt-5 overflow-auto">
+
+    <div class="d-flex">
+      <input type="checkbox" @change="checkAll" v-model="isCheckAll" />
+      <p class="mt-3">Check All</p>
+    </div>
+    <table class="table mt-2 overflow-auto">
       <thead class="overflow-auto" data-type="scroll">
         <tr>
           <th scope="col">Task</th>
@@ -106,7 +121,8 @@
       <tbody class="overflow-auto" data-type="scroll">
         <tr v-for="(task, index) in filteredTasks" :key="index">
           <td class="overflow-auto" data-type="scroll">
-            <input type="checkbox" name="brand" />
+            <input type="checkbox" v-model="task.isChecked" />
+
             <span
               data-spy="scroll"
               :class="{ completed: task.status === 'completed' }"
@@ -165,6 +181,11 @@ export default {
   name: "todoApp",
   data() {
     return {
+      optionsCheck: [
+        { value: "selectAll", text: "All" },
+        { value: "clearAllSelection", text: "None" },
+      ],
+
       options: [
         { value: null, text: "All Tasks" },
         { value: "to-do", text: "To-Do" },
@@ -181,6 +202,10 @@ export default {
       index: 0,
       toastCount: 0,
       selection1: null,
+      selector: null,
+      isChecked: false,
+      isCheckAll: false,
+
       colorChanger: [
         "white",
         "info",
@@ -201,18 +226,21 @@ export default {
           description: "learn About python flask",
           deadline: "2022-02-02",
           status: "in progress",
+          isChecked: false,
         },
         {
           name: "do workout",
           description: "hiit training",
           deadline: "2022-02-02",
           status: "to-do",
+          isChecked: true,
         },
         {
           name: "learn Vue.js",
           description: "remake the project with Vuex",
           deadline: "2022-02-02",
           status: "completed",
+          isChecked: false,
         },
       ],
     };
@@ -224,6 +252,31 @@ export default {
   },
 
   methods: {
+    TEST() {
+      for (let counter = this.tasks.length - 1; counter >= 0; counter--) {
+        if (this.tasks[counter].isChecked == true) {
+          this.tasks.splice(counter, 1);
+        }
+      }
+      localStorage.setItem("tasks", JSON.stringify(this.tasks));
+    },
+
+    checkAll(event) {
+      this.tasks.forEach((task) => {
+        task.isChecked = this.isCheckAll;
+      });
+      console.log(event);
+    },
+
+    //checkAll() {
+    //let items = document.getElementsByName("checkTodo");
+    //for (let i = 0; i < items.length; i++) {
+    //if (items[i].type == "checkBox") items[i].checked = true;
+    // }
+
+    //console.log("checkall calisti");
+    // },
+
     setSelection(value) {
       console.log(value);
       //  @change="(value) => $set('selection1', value)"
@@ -268,6 +321,7 @@ export default {
         callback: (confirm) => {
           if (confirm == true) {
             this.tasks.splice(index, 1);
+            localStorage.setItem("tasks", JSON.stringify(this.tasks));
           }
         },
       });
@@ -304,6 +358,7 @@ export default {
           status: "to-do",
           description: this.description,
           deadline: this.dateValue,
+          isChecked: false,
         });
         localStorage.setItem("tasks", JSON.stringify(this.tasks));
       }
@@ -339,7 +394,9 @@ export default {
       this.tasks[this.editedTask].name = this.task;
       this.tasks[this.editedTask].description = this.description;
       this.tasks[this.editedTask].deadline = this.dateValue;
-      // localStorage.setItem("tasks", JSON.stringify(this.tasks));
+      this.isChecked = false;
+      localStorage.setItem("tasks", JSON.stringify(this.tasks));
+
       this.editedTask = null;
       this.counter++;
     },
@@ -353,9 +410,6 @@ export default {
     }
   },
 
-  beforeDestroyed() {
-    localStorage.setItem("tasks", JSON.stringify(this.tasks));
-  },
   /*disarida tutulan bir object local storage da degisikliklerimi yapicak*/
   /*when u need to change data you use methods , when u need to change the presentation of existing data you use computed */
   computed: {
