@@ -63,7 +63,7 @@
           >Clear All Tasks</b-button
         >
 
-        <b-button
+        <!-- <b-button
           pill
           variant="danger"
           size="lg"
@@ -71,7 +71,7 @@
           class="mt-5 ms-5"
           @click="TEST"
           >TEST</b-button
-        >
+        > -->
         <!-- <b-button
           pill
           variant="info"
@@ -88,6 +88,13 @@
     <h1 class="text-center mt-5" style="color: red">Things To Do</h1>
     <div>
       <b-form-select v-model="selection1" :options="options"></b-form-select>
+      <b-button
+        size="sm"
+        align-v="center"
+        class="ms-2 btn btn-danger"
+        @click="TEST"
+        >TEST</b-button
+      >
 
       <!-- <b-dropdown
         v-model="selection1"
