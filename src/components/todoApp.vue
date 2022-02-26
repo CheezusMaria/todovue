@@ -128,7 +128,11 @@
       <tbody class="overflow-auto" data-type="scroll">
         <tr v-for="(task, index) in filteredTasks" :key="index">
           <td class="overflow-auto" data-type="scroll">
-            <input type="checkbox" v-model="task.isChecked" />
+            <input
+              type="checkbox"
+              v-model="task.isChecked"
+              @change="checkList"
+            />
 
             <span
               data-spy="scroll"
@@ -192,14 +196,12 @@ export default {
         { value: "selectAll", text: "All" },
         { value: "clearAllSelection", text: "None" },
       ],
-
       options: [
         { value: null, text: "All Tasks" },
         { value: "to-do", text: "To-Do" },
         { value: "in progress", text: "In Progress" },
         { value: "completed", text: "Completed" },
       ],
-
       availableStatus: ["to-do", "in progress", "completed"],
       value: null,
       task: null,
@@ -212,7 +214,6 @@ export default {
       selector: null,
       isChecked: false,
       isCheckAll: false,
-
       colorChanger: [
         "white",
         "info",
@@ -257,44 +258,52 @@ export default {
       required,
     },
   },
-
   methods: {
     TEST() {
-      for (let counter = this.tasks.length - 1; counter >= 0; counter--) {
-        if (this.tasks[counter].isChecked == true) {
-          this.tasks.splice(counter, 1);
-        }
-      }
-      localStorage.setItem("tasks", JSON.stringify(this.tasks));
+      this.$confirm({
+        title: "Confirm",
+        message: "This Will Remove All Your Tasks. Do You Wanna Continue ?",
+        button: {
+          yes: "Yes",
+          no: "Cancel",
+        },
+        callback: () => {
+          for (let counter = this.tasks.length - 1; counter >= 0; counter--) {
+            if (this.tasks[counter].isChecked == true) {
+              this.tasks.splice(counter, 1);
+            }
+          }
+          localStorage.setItem("tasks", JSON.stringify(this.tasks));
+        },
+      });
     },
 
+    checkList() {
+      this.isCheckAll =
+        this.tasks.filter((el) => el.isChecked == false).length == 0;
+    },
     checkAll(event) {
       this.tasks.forEach((task) => {
         task.isChecked = this.isCheckAll;
       });
       console.log(event);
     },
-
     //checkAll() {
     //let items = document.getElementsByName("checkTodo");
     //for (let i = 0; i < items.length; i++) {
     //if (items[i].type == "checkBox") items[i].checked = true;
     // }
-
     //console.log("checkall calisti");
     // },
-
     setSelection(value) {
       console.log(value);
       //  @change="(value) => $set('selection1', value)"
     },
     testStat() {},
-
     changeStatus1(index) {
       this.tasks[index].status = event.target.value;
       localStorage.setItem("tasks", JSON.stringify(this.tasks));
     },
-
     /* confirmation pop up to remove all tasks */
     showConfirm() {
       this.$confirm({
@@ -315,7 +324,6 @@ export default {
         },
       });
     },
-
     /**confirming pop up to deleting single task */
     showConfirmSingle(index) {
       this.$confirm({
@@ -333,11 +341,9 @@ export default {
         },
       });
     },
-
     /*   deleteTask(index){
         this.tasks.splice(index,1)
       },*/
-
     /*change background color func */
     changeColor() {
       console.log(this.index);
@@ -353,7 +359,6 @@ export default {
       if (++newIndex > 2) newIndex = 0;
       this.tasks[index].status = this.availableStatus[newIndex];
     },
-
     firstCharUpper(str) {
       return str.charAt(0).toUpperCase() + str.slice(1);
     },
@@ -373,14 +378,12 @@ export default {
       this.description = "";
       this.dateValue = "";
     },
-
     submitTaskx() {
       this.$v.$touch();
       if (this.$v.$invalid) {
         this.submitStatus = "ERROR";
       } else {
         this.submitTask();
-
         this.submitStatus = "PENDING";
         setTimeout(() => {
           this.submitStatus = "OK";
@@ -391,19 +394,16 @@ export default {
       this.task = this.tasks[index].name;
       this.description = this.tasks[index].description;
       this.editedTask = index;
-
       this.dateValue = this.tasks[index].deadline;
       console.log(this.dateValue);
       console.log(this.tasks[index].deadline);
     },
-
     editBtn() {
       this.tasks[this.editedTask].name = this.task;
       this.tasks[this.editedTask].description = this.description;
       this.tasks[this.editedTask].deadline = this.dateValue;
       this.isChecked = false;
       localStorage.setItem("tasks", JSON.stringify(this.tasks));
-
       this.editedTask = null;
       this.counter++;
     },
@@ -416,7 +416,6 @@ export default {
       this.tasks = JSON.parse(localStorage.getItem("tasks"));
     }
   },
-
   /*disarida tutulan bir object local storage da degisikliklerimi yapicak*/
   /*when u need to change data you use methods , when u need to change the presentation of existing data you use computed */
   computed: {
@@ -429,7 +428,6 @@ export default {
       });
     },
   },
-
   // watch: {
   //   tasks: {
   //     handler(updatedTasks) {
@@ -452,9 +450,7 @@ export default {
 .warning-req {
   color: red;
 }
-
 /* 
-
     this.toastCount++
           this.$bvToast.toast('Task Created Successfully',{
             title:'BootstrapVue Toast',
