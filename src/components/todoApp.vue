@@ -1,6 +1,6 @@
 <template>
   <div
-    :class="`container mb-5  bg-${colorChanger[index]} `"
+    :class="`container mb-5  bg-${colorChanger[index]}`"
     style="max-width: 800px"
   >
     <!--Title-->
@@ -92,27 +92,13 @@
         size="sm"
         align-v="center"
         class="ms-2 btn btn-danger"
-        @click="TEST"
-        >TEST</b-button
+        @click="deleteSelectedTasks"
+        >Delete</b-button
       >
-
-      <!-- <b-dropdown
-        v-model="selection1"
-        id="dropdown-1"
-        text="Selection"
-        class="m-md-2"
-        @click.native="setSelection"
-      >
-        <b-form-select>All</b-form-select>
-        <b-b-form-select-item>Finished</b-form-select>
-        <b-form-select>In-Progress</b-form-select>
-        <b-dropdown-item>To-Do</b-dropdown-item>
-      </b-dropdown> -->
     </div>
 
     <div class="d-flex">
-      <input type="checkbox" @change="checkAll" v-model="isCheckAll" />
-      <p class="mt-3">Check All</p>
+      <input type="checkbox" @change="checkAll" v-model="isCheckAll" />Check All
     </div>
     <table class="table mt-2 overflow-auto">
       <thead class="overflow-auto" data-type="scroll">
@@ -143,7 +129,7 @@
           </td>
           <td style="width: 120px">
             <select
-              @change="changeStatus1(index)"
+              @change="changeStatus(index)"
               name=""
               id=""
               class="pointer"
@@ -259,10 +245,10 @@ export default {
     },
   },
   methods: {
-    TEST() {
+    deleteSelectedTasks() {
       this.$confirm({
         title: "Confirm",
-        message: "This Will Remove All Your Tasks. Do You Wanna Continue ?",
+        message: "This Will Remove Selected Tasks. Do You Wanna Continue ?",
         button: {
           yes: "Yes",
           no: "Cancel",
@@ -277,30 +263,22 @@ export default {
         },
       });
     },
-
+    /*manupilating all checkboxes by using 'checkall' checkbox, it also works vice versa */
     checkList() {
-      this.isCheckAll =
-        this.tasks.filter((el) => el.isChecked == false).length == 0;
+      //using some func to checkall box
+      this.isCheckAll = !this.tasks.some((el) => el.isChecked == false);
     },
+    //using filter func for checkall box
+    // this.tasks.filter((el) => el.isChecked == false).length == 0;
+
     checkAll(event) {
       this.tasks.forEach((task) => {
         task.isChecked = this.isCheckAll;
       });
       console.log(event);
     },
-    //checkAll() {
-    //let items = document.getElementsByName("checkTodo");
-    //for (let i = 0; i < items.length; i++) {
-    //if (items[i].type == "checkBox") items[i].checked = true;
-    // }
-    //console.log("checkall calisti");
-    // },
-    setSelection(value) {
-      console.log(value);
-      //  @change="(value) => $set('selection1', value)"
-    },
-    testStat() {},
-    changeStatus1(index) {
+
+    changeStatus(index) {
       this.tasks[index].status = event.target.value;
       localStorage.setItem("tasks", JSON.stringify(this.tasks));
     },
@@ -341,9 +319,7 @@ export default {
         },
       });
     },
-    /*   deleteTask(index){
-        this.tasks.splice(index,1)
-      },*/
+
     /*change background color func */
     changeColor() {
       console.log(this.index);
@@ -353,12 +329,12 @@ export default {
         this.index++;
       }
     },
-    /* cahgestatus dropdown a gomulecek */
+    /* changestatus func by click, it takes the information from availablestatus array , changestatus1 func is used in project
     changeStatus(index) {
       let newIndex = this.availableStatus.indexOf(this.tasks[index].status);
       if (++newIndex > 2) newIndex = 0;
       this.tasks[index].status = this.availableStatus[newIndex];
-    },
+    }, */
     firstCharUpper(str) {
       return str.charAt(0).toUpperCase() + str.slice(1);
     },
@@ -450,6 +426,7 @@ export default {
 .warning-req {
   color: red;
 }
+
 /* 
     this.toastCount++
           this.$bvToast.toast('Task Created Successfully',{
