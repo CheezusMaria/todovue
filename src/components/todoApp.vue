@@ -32,6 +32,8 @@
         v-model="dateValue"
         class="mb-2"
       ></b-form-datepicker>
+      <input type="checkbox" v-model="saveAsNewCheck" @change="deneme" /> Save
+      As New Task
       <!-- <p>Value: '{{ value }}'</p> -->
 
       <div class="text-center d-flex justify-content-around">
@@ -42,9 +44,9 @@
           align-v="center"
           class="mt-5"
           @click="submitTaskx"
-          >Submit Your Task</b-button
+          >Submit</b-button
         >
-        <b-button
+        <!-- <b-button
           pill
           variant="warning"
           size="lg"
@@ -52,8 +54,8 @@
           class="mt-5 ms-5"
           @click="editBtn"
           >Edit Your Task</b-button
-        >
-        <b-button
+        > -->
+        <!-- <b-button
           pill
           variant="danger"
           size="lg"
@@ -61,7 +63,7 @@
           class="mt-5 ms-5"
           @click="showConfirm"
           >Clear All Tasks</b-button
-        >
+        > -->
 
         <!-- <b-button
           pill
@@ -173,6 +175,10 @@
 </template>
 
 <script>
+window.addEventListener("beforeunload", function (e) {
+  e.preventDefault();
+  e.returnValue = "";
+});
 import { required } from "vuelidate/lib/validators";
 export default {
   name: "todoApp",
@@ -200,6 +206,7 @@ export default {
       selector: null,
       isChecked: false,
       isCheckAll: false,
+      saveAsNewCheck: true,
       colorChanger: [
         "white",
         "info",
@@ -245,6 +252,9 @@ export default {
     },
   },
   methods: {
+    deneme() {
+      console.log(this.saveAsNewCheck);
+    },
     deleteSelectedTasks() {
       this.$confirm({
         title: "Confirm",
@@ -270,14 +280,12 @@ export default {
     },
     //using filter func for checkall box
     // this.tasks.filter((el) => el.isChecked == false).length == 0;
-
     checkAll(event) {
       this.tasks.forEach((task) => {
         task.isChecked = this.isCheckAll;
       });
       console.log(event);
     },
-
     changeStatus(index) {
       this.tasks[index].status = event.target.value;
       localStorage.setItem("tasks", JSON.stringify(this.tasks));
@@ -319,7 +327,6 @@ export default {
         },
       });
     },
-
     /*change background color func */
     changeColor() {
       console.log(this.index);
@@ -340,7 +347,7 @@ export default {
     },
     submitTask() {
       if (this.task.length === 0) return;
-      else {
+      if (this.saveAsNewCheck == true) {
         this.tasks.push({
           name: this.task,
           status: "to-do",
@@ -349,11 +356,20 @@ export default {
           isChecked: false,
         });
         localStorage.setItem("tasks", JSON.stringify(this.tasks));
+      } else {
+        this.tasks[this.editedTask].name = this.task;
+        this.tasks[this.editedTask].description = this.description;
+        this.tasks[this.editedTask].deadline = this.dateValue;
+        this.isChecked = false;
+        localStorage.setItem("tasks", JSON.stringify(this.tasks));
+        this.editedTask = null;
+        this.counter++;
       }
       this.task = "";
       this.description = "";
       this.dateValue = "";
     },
+
     submitTaskx() {
       this.$v.$touch();
       if (this.$v.$invalid) {
@@ -374,15 +390,15 @@ export default {
       console.log(this.dateValue);
       console.log(this.tasks[index].deadline);
     },
-    editBtn() {
-      this.tasks[this.editedTask].name = this.task;
-      this.tasks[this.editedTask].description = this.description;
-      this.tasks[this.editedTask].deadline = this.dateValue;
-      this.isChecked = false;
-      localStorage.setItem("tasks", JSON.stringify(this.tasks));
-      this.editedTask = null;
-      this.counter++;
-    },
+    // editBtn() {
+    //   this.tasks[this.editedTask].name = this.task;
+    //   this.tasks[this.editedTask].description = this.description;
+    //   this.tasks[this.editedTask].deadline = this.dateValue;
+    //   this.isChecked = false;
+    //   localStorage.setItem("tasks", JSON.stringify(this.tasks));
+    //   this.editedTask = null;
+    //   this.counter++;
+    // },
   },
   /* adding tasks into local storage */
   mounted() {
@@ -426,7 +442,6 @@ export default {
 .warning-req {
   color: red;
 }
-
 /* 
     this.toastCount++
           this.$bvToast.toast('Task Created Successfully',{
