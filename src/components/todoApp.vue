@@ -34,6 +34,9 @@
       ></b-form-datepicker>
       <input type="checkbox" v-model="saveAsNewCheck" @change="deneme" /> Save
       As New Task
+      <div class="error" v-if="!$v.task.required && submitStatus == 'ERROR'">
+        <span class="warning-req">You Have To Fill The Task Area..</span>
+      </div>
       <!-- <p>Value: '{{ value }}'</p> -->
 
       <div class="text-center d-flex justify-content-around">
@@ -97,6 +100,19 @@
         @click="deleteSelectedTasks"
         >Delete</b-button
       >
+      <!-- DENEME DENEMEDENEMEDENEMEDENEMEDENEMEDENEMEDENEMEDENEMEDENEMEDENEMEDENEMEDENEMEDENEME-->
+      <b-form-select
+        v-model="action1"
+        :options="options"
+        @change="(evt) => evt.value === action1"
+      ></b-form-select>
+      <b-button
+        size="sm"
+        align-v="center"
+        class="ms-2 btn btn-warning"
+        @click="applySelectedTasks"
+        >Apply</b-button
+      >
     </div>
 
     <div class="d-flex">
@@ -159,12 +175,12 @@
           <td>{{ task.deadline }}</td>
 
           <td>
-            <div class="text-center" @click="editTask(index)">
+            <div class="text-center pointer" @click="editTask(index)">
               <span class="fa fa-pen"></span>
             </div>
           </td>
           <td>
-            <div class="text-center" @click="showConfirmSingle(index)">
+            <div class="text-center pointer" @click="showConfirmSingle(index)">
               <span class="fa fa-trash"></span>
             </div>
           </td>
@@ -194,6 +210,12 @@ export default {
         { value: "in progress", text: "In Progress" },
         { value: "completed", text: "Completed" },
       ],
+      actions: [
+        { value: null, text: "Choose Action" },
+        { value: "make to-do", text: "To-Do" },
+        { value: "make in progress", text: "In Progress" },
+        { value: "make completed", text: "Completed" },
+      ],
       availableStatus: ["to-do", "in progress", "completed"],
       value: null,
       task: null,
@@ -203,6 +225,7 @@ export default {
       index: 0,
       toastCount: 0,
       selection1: null,
+      action1: null,
       selector: null,
       isChecked: false,
       isCheckAll: false,
@@ -272,6 +295,21 @@ export default {
           localStorage.setItem("tasks", JSON.stringify(this.tasks));
         },
       });
+    },
+
+    applySelectedTasks() {
+      console.log(this.action1);
+      for (let counter = this.tasks.length - 1; counter >= 0; counter--) {
+        if (this.tasks[counter].isChecked == true) {
+          //reactive atamalar $set islemi
+          //exp
+          // this.$set(this,"action1" , "completed");
+          // this["action1"] = "completed";
+
+          this.$set(this.tasks[counter], "status", this.action1);
+          // this.tasks[counter].status = this.action1;
+        }
+      }
     },
     /*manupilating all checkboxes by using 'checkall' checkbox, it also works vice versa */
     checkList() {
@@ -356,6 +394,8 @@ export default {
           isChecked: false,
         });
         localStorage.setItem("tasks", JSON.stringify(this.tasks));
+      } else if (this.editedTask === null) {
+        window.alert("Please Save Your Task As A New");
       } else {
         this.tasks[this.editedTask].name = this.task;
         this.tasks[this.editedTask].description = this.description;
